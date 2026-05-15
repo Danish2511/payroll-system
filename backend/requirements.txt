@@ -1,12 +1,33 @@
+# ─────────────────────────────────────────────────────────────
+# PayrollPro backend dependencies
+# Pinned to versions compatible with Python 3.11.9 (Render)
+# ─────────────────────────────────────────────────────────────
+
+# Web framework
 fastapi==0.111.0
 uvicorn[standard]==0.29.0
+
+# Database
 sqlalchemy==2.0.30
+psycopg2-binary==2.9.9      # PostgreSQL driver (Supabase)
+
+# Validation
 pydantic==2.7.1
+
+# Auth
 python-jose[cryptography]==3.3.0
-bcrypt==4.0.1
+passlib[bcrypt]==1.7.4
+
+# File uploads
 python-multipart==0.0.9
+
+# Excel + PDF generation
 openpyxl==3.1.2
 reportlab==4.1.0
+
+# Excel bulk-upload parsing
+# pandas 2.2.2 works on Python 3.11 — 3.14 breaks compilation
 pandas==2.2.2
+
+# Environment variables
 python-dotenv==1.0.1
-psycopg2-binary==2.9.9
