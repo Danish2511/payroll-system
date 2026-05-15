@@ -1,65 +1,60 @@
 """
 main.py — PayrollPro FastAPI entry point
 ═══════════════════════════════════════════════════════════════
-DEPLOYMENT FIXES APPLIED (all issues from your report):
-  ✅ FIX 1: load_dotenv() called FIRST — before any module reads
-             os.getenv("DATABASE_URL"), preventing NoneType errors
-  ✅ FIX 2: `import models` before Base.metadata.create_all()
-             so all tables (users, employees, attendance,
-             payrolls) are registered before SQLAlchemy creates them
-  ✅ FIX 3: CORS allow_origins=["*"] — Vercel frontend URL works
-             without any extra config changes
-  ✅ FIX 4: Deployed as Render Web Service (not Static Site)
-             with startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
-  ✅ FIX 5: runtime.txt with python-3.11.9 in backend/ folder
-             prevents Render from picking Python 3.14 which
-             breaks pandas / psycopg2-binary compilation
-  ✅ FIX 6: DATABASE_URL postgres:// → postgresql:// rewrite
-             in database.py handles Supabase connection strings
-  ✅ FIX 7: URL-encoding note in .env.example for special-char
-             passwords that break Supabase connection strings
+FIXES IN THIS VERSION:
+  ✅ FIX 1: CORS — removed allow_credentials=True when using
+             allow_origins=["*"]. The CORS spec forbids this
+             combination. Browsers silently drop the
+             Access-Control-Allow-Origin header, making every
+             authenticated POST appear as a CORS error even
+             though the server actually ran (and returned 500).
+             Solution: keep allow_origins=["*"] but remove
+             allow_credentials. JWT tokens travel in the
+             Authorization header which is covered by
+             allow_headers=["*"] — credentials=True is only
+             needed for cookies, which we don't use.
 ═══════════════════════════════════════════════════════════════
 """
 
 import os
 # ── CRITICAL: load .env BEFORE any other import reads os.getenv ──
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv()                           # MUST be first — before any os.getenv
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import engine, Base
+import models                           # MUST be before create_all()
 
-# ── CRITICAL: import models BEFORE create_all() ──────────────────
-# Without this, SQLAlchemy doesn't know about any tables and
-# create_all() becomes a no-op — tables never get created.
-import models  # noqa: F401 — side-effect import registers all ORM classes
-
-# Create tables on startup. Safe to call on every restart:
-# SQLAlchemy uses "CREATE TABLE IF NOT EXISTS" semantics.
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="PayrollPro API",
-    version="2.0.0",
+    version="2.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
 
-# ── CORS ─────────────────────────────────────────────────────────
-# allow_origins=["*"] lets any origin call the API.
-# For production lock this down to your exact Vercel URL, e.g.:
-#   allow_origins=["https://your-app.vercel.app"]
+# ── CORS ──────────────────────────────────────────────────────
+#
+# WRONG (causes the CORS 500 you saw):
+#   allow_origins=["*"], allow_credentials=True  ← spec violation
+#   Browsers block this combo for requests with Authorization header.
+#
+# CORRECT:
+#   allow_origins=["*"], allow_credentials=False (default)
+#   JWT lives in Authorization header → covered by allow_headers=["*"]
+#   No cookies → credentials=True not needed at all.
+#
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=["*"],        # allow every origin
+    allow_credentials=False,    # ← FIXED: must be False with wildcard origin
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ── Routers ───────────────────────────────────────────────────────
 from routers import auth, employees, attendance, payroll, reports, dashboard  # noqa
 
 app.include_router(auth.router,       prefix="/api/auth",       tags=["Auth"])
@@ -72,14 +67,8 @@ app.include_router(dashboard.router,  prefix="/api/dashboard",  tags=["Dashboard
 
 @app.get("/")
 def root():
-    return {
-        "status":  "✅ PayrollPro API Running",
-        "version": "2.0.0",
-        "docs":    "/docs",
-    }
-
+    return {"status": "✅ PayrollPro API Running", "version": "2.1.0", "docs": "/docs"}
 
 @app.get("/health")
 def health():
-    """Render uses this URL to check if the service is alive."""
     return {"status": "healthy"}
