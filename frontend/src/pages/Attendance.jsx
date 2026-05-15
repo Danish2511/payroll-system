@@ -119,7 +119,7 @@ function DayRow({ day, month, year, record, stdHours, onSave, onDelete, saving }
           type="number" step="0.5" min="0" max="24"
           value={outHrs}
           onChange={e => { setOutHrs(e.target.value); setDirty(true) }}
-          className="input py-1 text-xs font-mono w-16 text-center"
+          className="input py-1 text-xs font-mono w-20 text-center"
           placeholder="0"
         />
       </td>

@@ -27,8 +27,8 @@ export default function Sidebar() {
         </div>
         {!collapsed && (
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-bold text-white truncate">PayrollPro</div>
-            <div className="text-xs text-slate-500 truncate">Management System</div>
+            <div className="text-sm font-bold text-white truncate">Supe Hospital Payroll</div>
+            <div className="text-xs text-slate-500 truncate">Heart & Diabetes Centre</div>
           </div>
         )}
         <button onClick={() => setCollapsed(!collapsed)}
