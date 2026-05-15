@@ -4,9 +4,9 @@ import Sidebar from './components/Sidebar'
 import LoginPage    from './pages/LoginPage'
 import Dashboard    from './pages/Dashboard'
 import Employees    from './pages/Employees'
-// import Attendance   from './pages/Attendance'
-// import Payroll      from './pages/Payroll'
-// import Reports      from './pages/Reports'
+import Attendance   from './pages/Attendance'
+import Payroll      from './pages/Payroll'
+import Reports      from './pages/Reports'
 
 function Protected({ children, roles }) {
   const { user, loading } = useAuth()
@@ -43,7 +43,7 @@ export default function App() {
               <AppLayout><Employees /></AppLayout>
             </Protected>
           }/>
-          {/* <Route path="/attendance" element={
+          <Route path="/attendance" element={
             <Protected>
               <AppLayout><Attendance /></AppLayout>
             </Protected>
@@ -57,7 +57,7 @@ export default function App() {
             <Protected roles={['admin','hr']}>
               <AppLayout><Reports /></AppLayout>
             </Protected>
-          }/> */}
+          }/>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
