@@ -49,7 +49,7 @@ export default function LoginPage() {
             <Building2 size={26} className="text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">Supe Hospital </h1>
-          <p className="text-slate-500 text-sm mt-1">Heart & Diabetes Hospital Payroll System</p>
+          <p className="text-slate-500 text-sm mt-1">Heart And Diabetes Hospital And Research Centre</p>
         </div>
 
         <div className="card p-6">
@@ -80,7 +80,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-5 pt-5 border-t border-slate-800">
+          {/* <div className="mt-5 pt-5 border-t border-slate-800">
             <p className="text-slate-600 text-xs text-center mb-3">First time? Create the demo account:</p>
             <button onClick={handleSeed} disabled={seeding}
               className="btn-secondary w-full justify-center text-xs py-2">
@@ -88,12 +88,12 @@ export default function LoginPage() {
               {seeding ? 'Setting up…' : 'Seed Demo Data'}
             </button>
             {seedMsg && <p className="text-emerald-400 text-xs mt-2 text-center">{seedMsg}</p>}
-          </div>
+          </div> */}
         </div>
 
-        <p className="text-center text-slate-700 text-xs mt-6">
+        {/* <p className="text-center text-slate-700 text-xs mt-6">
           Demo: admin@clinic.com / admin123
-        </p>
+        </p> */}
       </div>
     </div>
   )

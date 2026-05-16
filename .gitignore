@@ -1,16 +1,33 @@
 # Python
 backend/venv/
 backend/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/**/*.pyd
+backend/routers/__pycache__/
 backend/*.pyc
-backend/routers/__pycache__/*
+
+# Python cache folders
+**/__pycache__/
 
 # Environment
 backend/.env
+frontend/.env
 frontend/.env.local
 
 # Node
 frontend/node_modules/
 frontend/dist/
+
+# Vite
+frontend/.vite/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
 
 # OS
 .DS_Store
