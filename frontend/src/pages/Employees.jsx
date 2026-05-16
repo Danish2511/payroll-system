@@ -363,8 +363,8 @@ export default function Employees() {
                     </td> */}
                     <td className="td font-mono text-emerald-400">
                       {user?.role === "admin"
-                        ? "₹ ******"
-                        : "₹ ******"}
+                        ? "₹*****"
+                        : "₹*****"}
                     </td>
                     <td className="td text-slate-400 text-xs">
                       {emp.standard_hours}h
