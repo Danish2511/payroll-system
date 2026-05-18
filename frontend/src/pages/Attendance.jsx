@@ -28,13 +28,23 @@ function calcHours(inT, outT, stdHours) {
   const i = parseHHMM(inT)
   const o = parseHHMM(outT)
   if (i == null || o == null) return { total: 0, diff: 0, ot: 0, less: 0 }
-  const total = (o - i) / 60
+
+  // Overnight shift: out < in means shift crosses midnight
+  // e.g. in=20:00(1200), out=08:00(480) → 480 < 1200 → overnight
+  const isOvernight = o < i
+  const trueMins    = isOvernight ? (24 * 60 - i) + o : o - i
+  const trueHours   = trueMins / 60
+
+  // Cap overnight shifts at stdHours for payroll — no phantom OT
+  // e.g. 20:00→08:00 = 12 physical hrs, but 8h std = 8 payroll hrs, OT = 0
+  const total = isOvernight ? Math.min(trueHours, stdHours) : trueHours
   const diff  = total - stdHours
   return {
-    total: total.toFixed(2),
-    diff:  diff.toFixed(2),
-    ot:    diff > 0 ? diff.toFixed(2) : '0.00',
-    less:  diff < 0 ? (-diff).toFixed(2) : '0.00',
+    total:       total.toFixed(2),
+    diff:        diff.toFixed(2),
+    ot:          diff > 0 ? diff.toFixed(2) : '0.00',
+    less:        diff < 0 ? (-diff).toFixed(2) : '0.00',
+    isOvernight,
   }
 }
 
@@ -83,7 +93,9 @@ function DayRow({ day, month, year, record, stdHours, onSave, onDelete, saving }
         {isSun
           ? <span className="badge-yellow text-xs">H</span>
           : present
-            ? <span className="badge-green text-xs">P</span>
+            ? calc.isOvernight
+              ? <span className="badge-blue text-xs">🌙 N</span>
+              : <span className="badge-green text-xs">P</span>
             : <span className="badge-red text-xs">A</span>
         }
       </td>
@@ -107,7 +119,9 @@ function DayRow({ day, month, year, record, stdHours, onSave, onDelete, saving }
         {present ? calc.total : '—'}
       </td>
       <td className="px-3 py-2 text-xs font-mono w-20 text-center">
-        {parseFloat(calc.diff) > 0
+        {calc.isOvernight && parseFloat(calc.ot) === 0 && parseFloat(calc.less) === 0
+          ? <span className="text-purple-400">Night</span>
+          : parseFloat(calc.diff) > 0
           ? <span className="text-emerald-400">+{calc.ot}h</span>
           : parseFloat(calc.less) > 0
             ? <span className="text-red-400">-{calc.less}h</span>
